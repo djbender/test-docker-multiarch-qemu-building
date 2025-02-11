@@ -52,3 +52,4 @@ jobs:
           source: .
           set: |
             *.platform=linux/amd64
+            *.platform=linux/arm64
