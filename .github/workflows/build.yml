@@ -1,0 +1,54 @@
+name: Build Images
+
+on:
+  push:
+    branches-ignore:
+      - "dependabot/**"
+  pull_request_target:
+    types: [labeled]
+  workflow_dispatch: {}
+
+jobs:
+  build-core-images:
+    runs-on: ubuntu-latest
+    if: >
+      contains(github.event.pull_request.labels.*.name, 'dependencies')
+      || github.event_name == 'push'
+      || github.event_name == 'workflow_dispatch'
+    permissions:
+      packages: write
+      contents: read
+    strategy:
+      fail-fast: false
+    timeout-minutes: 20
+    steps:
+      # If you want to set an environment variable equal to the result of a script
+      # you must do so via a run step, vs the `env: ` workflow syntax. Additinally see
+      # https://docs.github.com/en/actions/learn-github-actions/environment-variables#passing-values-between-steps-and-jobs-in-a-workflow
+      - name: set PWD environment variable
+        run: echo "PWD=$(pwd)" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.4.0
+        with:
+          image: tonistiigi/binfmt:qemu-v9.2.0-51
+
+      - name: Setup Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3.8.0
+        with:
+          install: true
+
+      - name: Build and push
+        uses: docker/bake-action@v6.2.0
+        with:
+          pull: true
+          push: false
+          files: jammy-bake.hcl
+          source: .
+          set: |
+            *.platform=linux/amd64
