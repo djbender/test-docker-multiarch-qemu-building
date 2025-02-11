@@ -51,4 +51,4 @@ jobs:
           files: jammy-bake.hcl
           source: .
           set: |
-            *.platform=linux/amd64
+            *.platform=linux/arm64
