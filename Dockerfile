@@ -2,7 +2,7 @@
 
 ########## tini ##########################
 # prepare tini binary (used as default entrypoint)
-FROM ubuntu:jammy as tini
+FROM ubuntu:jammy as core
 LABEL org.opencontainers.image.authors="djbender"
 LABEL org.opencontainers.image.source=https://github.com/djbender/docker-base-images
 
